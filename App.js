@@ -1,20 +1,62 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { SafeAreaView, StatusBar, View } from "react-native";
+import { AnimeContextProvider } from "./context/AnimeContext";
+import AppBar from "./components/AppBar";
+import HomeScreen from "./screens/HomeScreen";
+import FavoritesScreen from "./screens/FavoritesScreen";
+import BottomNavigation from "./navigation/BottomNavigation.js";
+import Sidebar from "./components/Sidebar";
+import AnimatedSplash from "./screens/AnimatedSplash";
+import { StyleSheet } from "react-native";
 
-export default function App() {
+const ToonPlayApp = () => {
+  const [currentTab, setCurrentTab] = useState("home");
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <AnimatedSplash onAnimationFinish={() => setShowSplash(false)} />;
+  }
+
+  const renderCurrentScreen = () => {
+    switch (currentTab) {
+      case "favorites":
+        return <FavoritesScreen />;
+      default:
+        return <HomeScreen />;
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AnimeContextProvider>
+      <SafeAreaView style={styles.appContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
+
+        <AppBar onMenuPress={() => setSidebarVisible(true)} />
+
+        {renderCurrentScreen()}
+
+        <BottomNavigation
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+        />
+
+        <Sidebar
+          isVisible={sidebarVisible}
+          onClose={() => setSidebarVisible(false)}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+        />
+      </SafeAreaView>
+    </AnimeContextProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
+  appContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
   },
 });
+
+export default ToonPlayApp;
